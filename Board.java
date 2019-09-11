@@ -309,9 +309,9 @@ public class Board extends JPanel implements ActionListener {
                 score++;
             }
             if(spaceShip.getLife() == 1 && instinctSurvival){
-                spaceShip.setSpecialAttack(true);
                 instinctSurvival = false;
-                setTimeout(() -> spaceShip.setSpecialAttack(false), 5000);
+                spaceShip.setInstinctSurvival(true);
+                setTimeout(() -> spaceShip.setInstinctSurvival(false), 5000);
             }
             spaceShip.keyPressed(e);
         }

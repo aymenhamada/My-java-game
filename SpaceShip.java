@@ -13,6 +13,7 @@ public class SpaceShip extends Sprite {
     private final int SPACE_SHIP_SPEED = 10;
     private List<Missile> missiles;
     public Boolean specialAttack = false;
+    public Boolean instinctSurvival = false;
     public int life = 3;
 
     public SpaceShip(int x, int y){
@@ -40,7 +41,6 @@ public class SpaceShip extends Sprite {
     public void keyPressed(KeyEvent e){
         int key = e.getKeyCode();
 
-
         if(key == KeyEvent.VK_SPACE){
             fire();
         }
@@ -62,21 +62,22 @@ public class SpaceShip extends Sprite {
     }
 
     public void fire(){
-        if(specialAttack && life > 1){
+        if(specialAttack){
             for(int i = 0; i < 20; i++){
                 missiles.add(new Missile((x / 2) + i * 40, y - 100 / 2));
             }
             specialAttack = false;
         }
-        else if(specialAttack && life == 1){
+        else{
+            missiles.add(new Missile(x + 15, y - 100 / 2 ));
+
+        }
+        if(instinctSurvival){
             for(int i = 0; i < 20; i++){
                 missiles.add(new Missile((x / 2) + i * 40, y - 100 / 2));
             }
         }
-        else{
-            missiles.add(new Missile(x + 25, y - 100 / 2 ));
-        }
-    }
+   }
 
     public void keyReleased(KeyEvent e){
         int key = e.getKeyCode();
@@ -114,5 +115,9 @@ public class SpaceShip extends Sprite {
 
     public Boolean getSpecialAttack(){
         return specialAttack;
+    }
+
+    public void setInstinctSurvival(Boolean bool){
+        this.instinctSurvival = bool;
     }
 }
