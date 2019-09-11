@@ -7,7 +7,7 @@ public class Explosion extends Sprite{
     }
 
     public void initExplosion(){
-        loadImage("explosion.gif");
+        loadImage("img/explosion.gif");
         getImageDimensions();
     }
 }

@@ -13,6 +13,7 @@ public class SpaceShip extends Sprite {
     private final int SPACE_SHIP_SPEED = 10;
     private List<Missile> missiles;
     public Boolean specialAttack = false;
+    public int life = 3;
 
     public SpaceShip(int x, int y){
         super(x, y);
@@ -21,7 +22,7 @@ public class SpaceShip extends Sprite {
 
     public void initSpaceShip(){
         missiles = new ArrayList<>();
-        loadImage("sprite.png");
+        loadImage("./img/sprite.png");
         getImageDimensions();
     }
 
@@ -61,11 +62,16 @@ public class SpaceShip extends Sprite {
     }
 
     public void fire(){
-        if(specialAttack){
+        if(specialAttack && life > 1){
             for(int i = 0; i < 20; i++){
                 missiles.add(new Missile((x / 2) + i * 40, y - 100 / 2));
             }
             specialAttack = false;
+        }
+        else if(specialAttack && life == 1){
+            for(int i = 0; i < 20; i++){
+                missiles.add(new Missile((x / 2) + i * 40, y - 100 / 2));
+            }
         }
         else{
             missiles.add(new Missile(x + 25, y - 100 / 2 ));
@@ -92,6 +98,15 @@ public class SpaceShip extends Sprite {
         }
     }
 
+    public void removeLife(){
+        if(life > 0){
+            life -= 1;
+        }
+    }
+
+    public int getLife(){
+        return life;
+    }
 
     public void setSpecialAttack(Boolean bool){
         this.specialAttack = bool;

@@ -25,9 +25,13 @@ public class Board extends JPanel implements ActionListener {
     private int AsteroidDelay = 300;
     private List<Asteroid> asteroids;
     private List<Explosion> explosions;
+    private Asteroid ricardo;
     private Random rand = new Random();
     public Boolean popBoss = false;
     public Boolean popPacman = false;
+    public Boolean ricardoPopped = false;
+    public Boolean allowRicardoFire = false;
+    public Boolean instinctSurvival = true;
 
     public Board(){
         initBoard();
@@ -48,14 +52,37 @@ public class Board extends JPanel implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent arg0) {
                 if(popBoss){
-                    asteroids.add(new Asteroid(rand.nextInt(1100), 0, 15, 300, 300, "theboss.png"));
+                    asteroids.add(new Boss(rand.nextInt(1100)));
                     popBoss = false;
                 }
                 if(popPacman){
-                    asteroids.add(new Asteroid(-200, spaceShip.getY(), 1, 200, 200, "pacman.png"));
+                    int randomPos = rand.nextInt(7);
+                    switch(randomPos){
+                        case 0:
+                            asteroids.add(new Pacman(-100, 0, randomPos));
+                            break;
+                        case 1:
+                            asteroids.add(new Pacman(1000, 0, randomPos));
+                            break;
+                        case 2:
+                            asteroids.add(new Pacman(-100, 1050, randomPos));
+                            break;
+                        case 3:
+                            asteroids.add(new Pacman(1300, 1050, randomPos));
+                            break;
+                        case 4:
+                            asteroids.add(new Pacman(-200, spaceShip.getY(), randomPos));
+                            break;
+                        case 5:
+                            asteroids.add(new Pacman(1400, spaceShip.getY(), randomPos));
+                            break;
+                        case 6:
+                            asteroids.add(new Pacman(spaceShip.getX(), 0, randomPos));
+                            break;
+                    }
                     popPacman = false;
                 }
-                asteroids.add(new Asteroid(rand.nextInt(1300), 0, 1, 100, 100, "asteroid.png"));
+                asteroids.add(new Asteroid(rand.nextInt(1300), 0, 1));
             }
         });
         asteroidTimer.start();
@@ -73,7 +100,12 @@ public class Board extends JPanel implements ActionListener {
         g2d.drawImage(spaceShip.getImage(), spaceShip.getX(), spaceShip.getY(), 80, 80, this);
 
         List<Missile> missiles = spaceShip.getMissiles();
-
+        if(ricardoPopped){
+            List<RicardoMissile> ricardoMissiles = ricardo.getMissiles();
+            for(RicardoMissile missile: ricardoMissiles){
+                g2d.drawImage(missile.getImage(), missile.getX(), missile.getY(), 60, 60, this);
+            }
+        }
         for(Missile missile : missiles){
             g2d.drawImage(missile.getImage(), missile.getX(), missile.getY(), 60, 60, this);
         }
@@ -94,6 +126,10 @@ public class Board extends JPanel implements ActionListener {
         updateMissiles();
         updateSpaceShip();
         updateAsteroid();
+        if(ricardoPopped){
+            updateRicardoMissiles();
+            asteroidTimer.stop();
+        }
         repaint();
     }
 
@@ -119,24 +155,38 @@ public class Board extends JPanel implements ActionListener {
                 if(missile.getX() < obstacleX && missile.getX() + 60 > obstacleX && missile.getX() + 60 < hitBoxX && missile.getY() < obstacleY && missile.getY() + 60 > obstacleY && missile.getY() + 60 < hitBoxY){
                     asteroid.removeLife();
                     if(asteroid.getLife() == 0){
-                        if(asteroid.pacman){
-                            score += 5;
+                        if(asteroid.isPacman()){
+                            score += 4;
+                        }
+                        if(asteroid.isRicardo()){
+                            ricardoPopped = false;
+                            allowRicardoFire = false;
                         }
                         asteroids.remove(w);
                         score ++;
                         makeBoss();
                     }
-                    missiles.remove(i);
-                    explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
-                    setTimeout(() -> explosions.remove(0), 500);
-                    if(AsteroidDelay - score > 20){
-                        asteroidTimer.setDelay(AsteroidDelay - score);
-                        asteroidTimer.restart();
+                    if(i < missiles.size()){
+                        missiles.remove(i);
+                        explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
+                        setTimeout(() -> explosions.remove(0), 505);
+                        if(AsteroidDelay - score > 20){
+                            asteroidTimer.setDelay(AsteroidDelay - score);
+                            asteroidTimer.restart();
+                        }
                     }
                 }
+
+
                 if(missile.getX() > obstacleX && missile.getX() < hitBoxX && missile.getY() > obstacleY && missile.getY() < hitBoxY){
                     asteroid.removeLife();
                     if(asteroid.getLife() == 0){
+                        if(asteroid.isPacman()){
+                            score += 4;
+                        }
+                        if(asteroid.isRicardo()){
+                            ricardoPopped = false;
+                        }
                         asteroids.remove(w);
                         score++;
                         makeBoss();
@@ -144,7 +194,7 @@ public class Board extends JPanel implements ActionListener {
                     if(i < missiles.size()){
                         missiles.remove(i);
                         explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
-                        setTimeout(() -> explosions.remove(0), 500);
+                        setTimeout(() -> explosions.remove(0), 505);
                         if(AsteroidDelay - score > 20){
                             asteroidTimer.setDelay(AsteroidDelay - score);
                             asteroidTimer.restart();
@@ -159,11 +209,55 @@ public class Board extends JPanel implements ActionListener {
         spaceShip.move();
     }
 
+
+    private void updateRicardoMissiles(){
+        ricardo = asteroids.get(asteroids.size() - 1);
+        List<RicardoMissile> missiles = ricardo.getMissiles();
+
+        for(int i = 0; i < missiles.size(); i++){
+            RicardoMissile missile = missiles.get(i);
+
+            if(missile.isVisible()){
+                missile.move();
+            }
+            else{
+                missiles.remove(i);
+            }
+
+            int obstacleX = spaceShip.getX();
+            int obstacleY = spaceShip.getY();
+            double hitBoxX = obstacleX + 80;
+            double hitBoxY = obstacleY + 80;
+
+            if(missile.getX() < obstacleX && missile.getX() + 60  > obstacleX && missile.getX() + 60 < hitBoxX && missile.getY() < obstacleY && missile.getY() + 60 > obstacleY && missile.getY() + 60 < hitBoxY){
+                explosions.add(new Explosion(spaceShip.getX() + (80 / 3), spaceShip.getY() + (80 / 3) ));
+                setTimeout(() -> explosions.remove(0), 505);
+                spaceShip.removeLife();
+                if(spaceShip.getLife() == 0){
+                    timer.stop();
+                }
+                missiles.remove(i);
+            }
+            if(missile.getX() >= obstacleX && missile.getX() <= hitBoxX && missile.getY() >= obstacleY && missile.getY() <= hitBoxY){
+                explosions.add(new Explosion(spaceShip.getX() + (80 / 3), spaceShip.getY() + (80 / 3) ));
+                setTimeout(() -> explosions.remove(0), 505);
+                spaceShip.removeLife();
+                if(spaceShip.getLife() == 0){
+                    timer.stop();
+                }
+                missiles.remove(i);
+            }
+        }
+    }
+
     private void updateAsteroid(){
         for(int i = 0; i < asteroids.size(); i++){
             Asteroid asteroid = asteroids.get(i);
 
             if(asteroid.isVisible()){
+                if(asteroid.isRicardo() && allowRicardoFire){
+                    asteroid.fire();
+                }
                 asteroid.move();
             }
             else{
@@ -193,8 +287,13 @@ public class Board extends JPanel implements ActionListener {
         if(score % 10 == 0 && score > 0 ){
             popBoss = true;
         }
-        if(score % 25 == 0 && score > 0){
+        if(score % 20 == 0 && score > 0){
             popPacman = true;
+        }
+        if(score % 50 == 0 && score > 0 && !ricardoPopped){
+            asteroids.add(new Ricardo(500));
+            setTimeout(() -> allowRicardoFire = true, 1500);
+            ricardoPopped = true;
         }
     }
     private class TAdapter extends KeyAdapter{
@@ -208,6 +307,11 @@ public class Board extends JPanel implements ActionListener {
             if(score % 10 == 0 && score > 0){
                 spaceShip.setSpecialAttack(true);
                 score++;
+            }
+            if(spaceShip.getLife() == 1 && instinctSurvival){
+                spaceShip.setSpecialAttack(true);
+                instinctSurvival = false;
+                setTimeout(() -> spaceShip.setSpecialAttack(false), 5000);
             }
             spaceShip.keyPressed(e);
         }

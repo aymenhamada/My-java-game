@@ -1,31 +1,23 @@
 
+import java.util.List;
 
 public class Asteroid extends Sprite{
     private  int MOVE_SPEED = 5;
-    private final int BOARD_HEIGHT = 1050;
-    public Boolean boss = false;
-    public Boolean pacman = false;
+    protected final int BOARD_HEIGHT = 1050;
     public int life;
+    private List<RicardoMissile> missile;
 
 
-    public Asteroid(int x, int y, int life, int width, int height,  String path){
-        super(x, y);
+    public Asteroid(int x, int y, int life){
+        super(x, 0);
         this.life = life;
-        this.width = width;
-        this.height = height;
-        initAsteroid(path);
+        this.width = 100;
+        this.height = 100;
+        initAsteroid();
     }
 
-    public void initAsteroid(String path){
-        if(path == "theboss.png"){
-            MOVE_SPEED = 2;
-            boss = true;
-        }
-        if(path == "pacman.png"){
-            MOVE_SPEED = 15;
-            pacman = true;
-        }
-        loadImage(path);
+    private void initAsteroid(){
+        loadImage("./img/asteroid.png");
     }
 
 
@@ -48,16 +40,27 @@ public class Asteroid extends Sprite{
     }
 
     public boolean isBoss(){
-        return boss;
+        return false;
+    }
+
+    public boolean isPacman(){
+        return false;
+    }
+
+    public boolean isRicardo(){
+        return false;
+    }
+
+    public List<RicardoMissile> getMissiles(){
+        return missile;
+    }
+
+
+    public void fire(){
     }
 
     public void move(){
-        if(!pacman){
-            y += MOVE_SPEED;
-        }
-        else{
-            x += MOVE_SPEED;
-        }
+        y += MOVE_SPEED;
         if(y > BOARD_HEIGHT || x > 1400){
             visible = false;
         }
