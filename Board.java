@@ -33,6 +33,9 @@ public class Board extends JPanel implements ActionListener {
     public Boolean allowRicardoFire = false;
     public Boolean instinctSurvival = true;
 
+    public Boolean pacManFrenzy = false;
+    public Boolean pacManFrenzyPopped = false;
+
     public Board(){
         initBoard();
     }
@@ -77,7 +80,7 @@ public class Board extends JPanel implements ActionListener {
                             asteroids.add(new Pacman(1400, spaceShip.getY(), randomPos));
                             break;
                         case 6:
-                            asteroids.add(new Pacman(spaceShip.getX(), 0, randomPos));
+                            asteroids.add(new Pacman(rand.nextInt(1200), 0, randomPos));
                             break;
                     }
                     popPacman = false;
@@ -130,9 +133,11 @@ public class Board extends JPanel implements ActionListener {
             updateRicardoMissiles();
             asteroidTimer.stop();
         }
+        if(pacManFrenzy){
+            asteroidTimer.stop();
+        }
         repaint();
     }
-
     private void updateMissiles(){
         List<Missile> missiles = spaceShip.getMissiles();
 
@@ -186,6 +191,7 @@ public class Board extends JPanel implements ActionListener {
                         }
                         if(asteroid.isRicardo()){
                             ricardoPopped = false;
+                            allowRicardoFire = false;
                         }
                         asteroids.remove(w);
                         score++;
@@ -290,10 +296,15 @@ public class Board extends JPanel implements ActionListener {
         if(score % 20 == 0 && score > 0){
             popPacman = true;
         }
-        if(score % 50 == 0 && score > 0 && !ricardoPopped){
+        if(score % 100 == 0 && score > 0 && !ricardoPopped){
             asteroids.add(new Ricardo(500));
             setTimeout(() -> allowRicardoFire = true, 1500);
             ricardoPopped = true;
+        }
+        if(score % 50 == 0 && score > 0 && !pacManFrenzyPopped){
+            pacManFrenzy = true;
+            pacManFrenzyPopped = true;
+            popMultiplePacman();
         }
     }
     private class TAdapter extends KeyAdapter{
@@ -328,4 +339,35 @@ public class Board extends JPanel implements ActionListener {
             }
         }).start();
     }
+
+    public void popMultiplePacman(){
+        for(int i = 0; i < 10; i++){
+            int randomPos = rand.nextInt(7);
+            switch(randomPos){
+                case 0:
+                    setTimeout(() -> asteroids.add(new Pacman(-100, 0, randomPos)), i * 750);
+                    break;
+                case 1:
+                    setTimeout(() -> asteroids.add(new Pacman(1000, 0, randomPos)), i * 750);
+                    break;
+                case 2:
+                    setTimeout(() -> asteroids.add(new Pacman(-100, 1050, randomPos)), i * 750);
+                    break;
+                case 3:
+                    setTimeout(() -> asteroids.add(new Pacman(1300, 1050, randomPos)), i * 750);
+                    break;
+                case 4:
+                    setTimeout(() -> asteroids.add(new Pacman(-200, spaceShip.getY(), randomPos)), i * 750);
+                    break;
+                case 5:
+                    setTimeout(() -> asteroids.add(new Pacman(1400, spaceShip.getY(), randomPos)), i * 750);
+                    break;
+                case 6:
+                    setTimeout(() ->  asteroids.add(new Pacman(rand.nextInt(1200), 0, randomPos)), i * 750);
+                    break;
+            }
+            setTimeout(() -> {pacManFrenzy = false; asteroidTimer.restart();}, 10 * 800);
+        }
+    }
+
 }

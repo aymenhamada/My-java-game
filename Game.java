@@ -11,7 +11,7 @@ public class Game extends JFrame {
 
         add(new Board());
 
-        setTitle("Moving sprite");
+        setTitle("SpaceShip");
         setSize(1400, 1400);
         setLocationRelativeTo(null);
         setResizable(false);
