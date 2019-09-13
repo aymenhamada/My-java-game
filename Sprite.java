@@ -1,6 +1,6 @@
 import java.awt.Image;
 import javax.swing.ImageIcon;
-
+import java.net.URL;
 public  class Sprite{
 
     protected int x;
@@ -17,7 +17,8 @@ public  class Sprite{
     }
 
     protected void loadImage(String imageName){
-        ImageIcon ii = new ImageIcon(imageName);
+        URL url = getClass().getResource(imageName);
+        ImageIcon ii = new ImageIcon(url);
         image = ii.getImage();
     }
 

@@ -2,16 +2,26 @@
 public class Missile extends Sprite{
     private  int BOARD_HEIGHT;
     private final int MISSILE_SPEED = 15;
+    public Boolean isSuperAttack = false;
 
-    public Missile(int x, int y){
+
+    public Missile(int x, int y, String pathname){
         super(x, y);
-        initMissile();
+        if(pathname == "img/lasershot.png"){
+            isSuperAttack = true;
+            System.out.println("hi");
+        }
+        initMissile(pathname);
         this.BOARD_HEIGHT = 0 - this.width;
     }
 
-    private void initMissile(){
-        loadImage("./img/laser.png");
+    private void initMissile(String pathname){
+        loadImage(pathname);
         getImageDimensions();
+    }
+
+    public boolean isSuperAttack(){
+        return this.isSuperAttack;
     }
 
     public void move(){

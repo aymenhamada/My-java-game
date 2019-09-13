@@ -17,13 +17,13 @@ public class Asteroid extends Sprite{
     }
 
     private void initAsteroid(){
-        loadImage("./img/asteroid.png");
+        loadImage("img/asteroid.png");
     }
 
 
-    public void removeLife(){
+    public void removeLife(int damage){
         if(life > 0){
-            life -= 1;
+            life -= damage;
         }
     }
 
@@ -48,6 +48,10 @@ public class Asteroid extends Sprite{
     }
 
     public boolean isRicardo(){
+        return false;
+    }
+
+    public boolean isBonus(){
         return false;
     }
 

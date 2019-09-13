@@ -9,7 +9,7 @@ public class RicardoMissile extends Sprite{
     }
 
     public void initRicardoMissile(){
-        loadImage("./img/lasershot.png");
+        loadImage("img/lasershot.png");
     }
 
     public void move(){

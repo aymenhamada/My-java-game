@@ -10,7 +10,7 @@ public class Boss extends Asteroid{
     }
 
     public void initBoss(){
-        loadImage("./img/theboss.png");
+        loadImage("img/theboss.png");
     }
 
     @Override

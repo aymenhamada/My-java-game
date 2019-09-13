@@ -32,6 +32,7 @@ public class Board extends JPanel implements ActionListener {
     public Boolean ricardoPopped = false;
     public Boolean allowRicardoFire = false;
     public Boolean instinctSurvival = true;
+    public Boolean gameLoose = false;
 
     public Boolean pacManFrenzy = false;
     public Boolean pacManFrenzyPopped = false;
@@ -84,6 +85,11 @@ public class Board extends JPanel implements ActionListener {
                             break;
                     }
                     popPacman = false;
+                }
+                int anotherRandom = rand.nextInt(30);
+                if(anotherRandom == 9 && score > 0){
+                    asteroids.add(new Bonus(rand.nextInt(1300)));
+                    score++;
                 }
                 asteroids.add(new Asteroid(rand.nextInt(1300), 0, 1));
             }
@@ -158,52 +164,66 @@ public class Board extends JPanel implements ActionListener {
                 int hitBoxY = obstacleY + asteroid.getHeight();
 
                 if(missile.getX() < obstacleX && missile.getX() + 60 > obstacleX && missile.getX() + 60 < hitBoxX && missile.getY() < obstacleY && missile.getY() + 60 > obstacleY && missile.getY() + 60 < hitBoxY){
-                    asteroid.removeLife();
-                    if(asteroid.getLife() == 0){
-                        if(asteroid.isPacman()){
-                            score += 4;
+                    if(!asteroid.isBonus()){
+                        if(missile.isSuperAttack()){
+                            asteroid.removeLife(15);
                         }
-                        if(asteroid.isRicardo()){
-                            ricardoPopped = false;
-                            allowRicardoFire = false;
+                        else{
+                            asteroid.removeLife(1);
                         }
-                        asteroids.remove(w);
-                        score ++;
-                        makeBoss();
-                    }
-                    if(i < missiles.size()){
-                        missiles.remove(i);
-                        explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
-                        setTimeout(() -> explosions.remove(0), 505);
-                        if(AsteroidDelay - score > 20){
-                            asteroidTimer.setDelay(AsteroidDelay - score);
-                            asteroidTimer.restart();
+                        if(asteroid.getLife() <= 0){
+                            if(asteroid.isPacman()){
+                                score += 4;
+                            }
+                            if(asteroid.isRicardo()){
+                                ricardoPopped = false;
+                                allowRicardoFire = false;
+                            }
+                            asteroids.remove(w);
+                            score ++;
+                            makeBoss();
+                        }
+                        if(i < missiles.size()){
+                            missiles.remove(i);
+                            explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
+                            setTimeout(() -> explosions.remove(0), 505);
+                            if(AsteroidDelay - score > 90){
+                                asteroidTimer.setDelay(AsteroidDelay - score);
+                                asteroidTimer.restart();
+                            }
                         }
                     }
                 }
 
 
                 if(missile.getX() > obstacleX && missile.getX() < hitBoxX && missile.getY() > obstacleY && missile.getY() < hitBoxY){
-                    asteroid.removeLife();
-                    if(asteroid.getLife() == 0){
-                        if(asteroid.isPacman()){
-                            score += 4;
+                    if(!asteroid.isBonus()){
+                        if(missile.isSuperAttack()){
+                            asteroid.removeLife(15);
                         }
-                        if(asteroid.isRicardo()){
-                            ricardoPopped = false;
-                            allowRicardoFire = false;
+                        else{
+                            asteroid.removeLife(1);
                         }
-                        asteroids.remove(w);
-                        score++;
-                        makeBoss();
-                    }
-                    if(i < missiles.size()){
-                        missiles.remove(i);
-                        explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
-                        setTimeout(() -> explosions.remove(0), 505);
-                        if(AsteroidDelay - score > 20){
-                            asteroidTimer.setDelay(AsteroidDelay - score);
-                            asteroidTimer.restart();
+                        if(asteroid.getLife() <= 0){
+                            if(asteroid.isPacman()){
+                                score += 4;
+                            }
+                            if(asteroid.isRicardo()){
+                                ricardoPopped = false;
+                                allowRicardoFire = false;
+                            }
+                            asteroids.remove(w);
+                            score++;
+                            makeBoss();
+                        }
+                        if(i < missiles.size()){
+                            missiles.remove(i);
+                            explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
+                            setTimeout(() -> explosions.remove(0), 505);
+                            if(AsteroidDelay - score > 90){
+                                asteroidTimer.setDelay(AsteroidDelay - score);
+                                asteroidTimer.restart();
+                            }
                         }
                     }
                 }
@@ -240,7 +260,8 @@ public class Board extends JPanel implements ActionListener {
                 setTimeout(() -> explosions.remove(0), 505);
                 spaceShip.removeLife();
                 if(spaceShip.getLife() == 0){
-                    timer.stop();
+                    gameOver();
+                    return;
                 }
                 missiles.remove(i);
             }
@@ -249,7 +270,8 @@ public class Board extends JPanel implements ActionListener {
                 setTimeout(() -> explosions.remove(0), 505);
                 spaceShip.removeLife();
                 if(spaceShip.getLife() == 0){
-                    timer.stop();
+                    gameOver();
+                    return;
                 }
                 missiles.remove(i);
             }
@@ -268,8 +290,8 @@ public class Board extends JPanel implements ActionListener {
             }
             else{
                 if(asteroid.isBoss()){
-                    timer.stop();
-                    asteroidTimer.stop();
+                    gameOver();
+                    return;
                 }
                 asteroids.remove(i);
             }
@@ -279,12 +301,22 @@ public class Board extends JPanel implements ActionListener {
             double hitBoxX = obstacleX + (asteroid.getWidth() * 0.90);
             double hitBoxY = obstacleY + (asteroid.getHeight() * 0.50);
             if(spaceShip.getX() < obstacleX && spaceShip.getX() + 70  > obstacleX && spaceShip.getX() + 70 < hitBoxX && spaceShip.getY() < obstacleY && spaceShip.getY() + 70 > obstacleY && spaceShip.getY() + 70 < hitBoxY){
-                timer.stop();
-                asteroidTimer.stop();
+                if(!asteroid.isBonus()){
+                    gameOver();
+                    return;
+                }else{
+                    asteroids.remove(i);
+                    spaceShip.setSuperAttack(true);
+                }
             }
             if(spaceShip.getX() >= obstacleX && spaceShip.getX() <= hitBoxX && spaceShip.getY() >= obstacleY && spaceShip.getY() <= hitBoxY){
-                timer.stop();
-                asteroidTimer.stop();
+                if(!asteroid.isBonus()){
+                    gameOver();
+                    return;
+                }else{
+                    asteroids.remove(i);
+                    spaceShip.setSuperAttack(true);
+                }
             }
         }
     }
@@ -301,7 +333,7 @@ public class Board extends JPanel implements ActionListener {
             setTimeout(() -> allowRicardoFire = true, 1500);
             ricardoPopped = true;
         }
-        if(score % 50 == 0 && score > 0 && !pacManFrenzyPopped){
+        if(score >= 50 && score > 0 && !pacManFrenzyPopped){
             pacManFrenzy = true;
             pacManFrenzyPopped = true;
             popMultiplePacman();
@@ -315,6 +347,7 @@ public class Board extends JPanel implements ActionListener {
 
         @Override
         public void keyPressed(KeyEvent e){
+            int key = e.getKeyCode();
             if(score % 10 == 0 && score > 0){
                 spaceShip.setSpecialAttack(true);
                 score++;
@@ -325,6 +358,11 @@ public class Board extends JPanel implements ActionListener {
                 setTimeout(() -> spaceShip.setInstinctSurvival(false), 5000);
             }
             spaceShip.keyPressed(e);
+            if(key == 82){
+                if(gameLoose){
+                    gameRestart();
+                }
+            }
         }
     }
 
@@ -345,29 +383,96 @@ public class Board extends JPanel implements ActionListener {
             int randomPos = rand.nextInt(7);
             switch(randomPos){
                 case 0:
-                    setTimeout(() -> asteroids.add(new Pacman(-100, 0, randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(-100, 0, randomPos));
+                        }}, i * 750);
                     break;
                 case 1:
-                    setTimeout(() -> asteroids.add(new Pacman(1000, 0, randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(1000, 0, randomPos));
+                        }
+                        }, i * 750);
                     break;
                 case 2:
-                    setTimeout(() -> asteroids.add(new Pacman(-100, 1050, randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(-100, 1050, randomPos));
+                        }
+                        }, i * 750);
                     break;
                 case 3:
-                    setTimeout(() -> asteroids.add(new Pacman(1300, 1050, randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(1300, 1050, randomPos));
+                        }
+                        }, i * 750);
                     break;
                 case 4:
-                    setTimeout(() -> asteroids.add(new Pacman(-200, spaceShip.getY(), randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(-200, spaceShip.getY(), randomPos));
+                        }
+                        }, i * 750);
                     break;
                 case 5:
-                    setTimeout(() -> asteroids.add(new Pacman(1400, spaceShip.getY(), randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(1400, spaceShip.getY(), randomPos));
+                        }
+                        }, i * 750);
                     break;
                 case 6:
-                    setTimeout(() ->  asteroids.add(new Pacman(rand.nextInt(1200), 0, randomPos)), i * 750);
+                    setTimeout(() -> {
+                        if(pacManFrenzyPopped){
+                            asteroids.add(new Pacman(rand.nextInt(1200), 0, randomPos));
+                        }
+                        }, i * 750);
                     break;
             }
             setTimeout(() -> {pacManFrenzy = false; asteroidTimer.restart();}, 10 * 800);
         }
+    }
+
+    public void gameOver(){
+        timer.stop();
+        asteroidTimer.stop();
+        AsteroidDelay = 300;
+        gameLoose = true;
+    }
+
+    public void gameRestart(){
+        gameLoose = false;
+        List<Missile> missiles = spaceShip.getMissiles();
+        if(ricardoPopped){
+            List<RicardoMissile> ricardoMissiles = ricardo.getMissiles();
+            int nbrRicardoMissiles = ricardoMissiles.size();
+            for(int i = 0; i < nbrRicardoMissiles; i++){
+                ricardoMissiles.remove(0);
+            }
+        }
+        int nbrExplosion = explosions.size();
+        for(int i = 0; i < nbrExplosion; i++){
+            explosions.remove(0);
+        }
+
+        int nbrMissiles = missiles.size();
+        for(int i = 0; i < nbrMissiles; i++){
+            missiles.remove(0);
+        }
+
+        int nbrAsteroids= asteroids.size();
+        for(int i = 0; i < nbrAsteroids; i++){
+            asteroids.remove(0);
+        }
+        spaceShip.x = this.ICRAFT_X;
+        spaceShip.y = this.ICRAFT_Y;
+        score = 0;
+        pacManFrenzyPopped = false;
+        pacManFrenzy = false;
+        spaceShip.setDefaultStats();
+        setTimeout(() -> {timer.restart(); asteroidTimer.restart();}, 500);
     }
 
 }

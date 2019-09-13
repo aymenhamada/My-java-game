@@ -15,7 +15,7 @@ public class Pacman extends Asteroid{
     }
 
     public void initPacman(){
-        loadImage("./img/pacman.png");
+        loadImage("img/pacman.png");
     }
 
     @Override

@@ -23,7 +23,7 @@ public class Ricardo extends Asteroid{
 
     private void initRicardo(){
         missiles = new ArrayList<>();
-        loadImage("./img/ricardo.png");
+        loadImage("img/ricardo.png");
     }
 
 
@@ -65,12 +65,12 @@ public class Ricardo extends Asteroid{
     public void move(){
         int random = rand.nextInt(20);
 
-        if(random == 0 && x < 1100 || ricardoGoRight && x < 1100){
+        if(random == 6 && x < 1100 || ricardoGoRight && x < 1100){
             ricardoGoRight = true;
             ricardoGoLeft = false;
             x += MOVE_SPEED;
         }
-        if(random == 1  && x > 0|| ricardoGoLeft && x > 0){
+        if(random == 15  && x > 0|| ricardoGoLeft && x > 0){
             ricardoGoLeft = true;
             ricardoGoRight = false;
             x -= MOVE_SPEED;
