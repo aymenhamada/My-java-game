@@ -4,6 +4,7 @@ import java.util.Random;
 public class Pacman extends Asteroid{
     public int randomPos;
     public int MOVE_SPEED = 10;
+    public Random rand = new Random();
 
     Pacman(int x, int y, int randomPos){
         super(x, y, 1);
@@ -15,7 +16,13 @@ public class Pacman extends Asteroid{
     }
 
     public void initPacman(){
-        loadImage("img/pacman.png");
+        int random = rand.nextInt(5);
+        if(random == 4){
+            loadImage("img/karris.png");
+        }
+        else{
+            loadImage("img/pacman.png");
+        }
     }
 
     @Override

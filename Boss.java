@@ -1,6 +1,8 @@
 
+import java.util.Random;
 public class Boss extends Asteroid{
     public int MOVE_SPEED = 2;
+    public Random rand = new Random();
 
     Boss(int x){
         super(x, 0, 15);

@@ -9,36 +9,31 @@ public class Ricardo extends Asteroid{
     public Random rand = new Random();
     private  int MOVE_SPEED = 5;
     public int life;
+    public int maxlife;
     public Boolean ricardoGoRight = false;
     public Boolean ricardoGoLeft = false;
 
 
     public Ricardo(int x){
-        super(x, 0, 15);
+        super(x, 25, 50);
         this.life = 50;
-        this.width = 300;
-        this.height = 300;
+        this.maxlife = 50;
+        this.width = 275;
+        this.height = 275;
         initRicardo();
     }
 
     private void initRicardo(){
         missiles = new ArrayList<>();
-        loadImage("img/ricardo.png");
+        loadImage("img/ricardo.gif");
     }
-
+    @Override
+    public int maxLife(){
+        return maxlife;
+    }
 
     public List<RicardoMissile> getMissiles(){
         return missiles;
-    }
-
-    public void removeLife(){
-        if(life > 0){
-            life -= 1;
-        }
-    }
-
-    public int getLife(){
-        return life;
     }
 
     public int getWidth(){
@@ -49,7 +44,16 @@ public class Ricardo extends Asteroid{
         return height;
     }
 
+    public void removeLife(int damage){
+        if(life > 0){
+            life -= damage;
+        }
+    }
     @Override
+    public int getLife() {
+        return life;
+    }
+
     public boolean isRicardo(){
         return true;
     }

@@ -13,7 +13,6 @@ import javax.swing.JPanel;
 import javax.swing.Timer;
 import java.util.Random;
 
-
 public class Board extends JPanel implements ActionListener {
     private final int ICRAFT_X = 400;
     private final int ICRAFT_Y = 800;
@@ -33,6 +32,7 @@ public class Board extends JPanel implements ActionListener {
     public Boolean allowRicardoFire = false;
     public Boolean instinctSurvival = true;
     public Boolean gameLoose = false;
+
 
     public Boolean pacManFrenzy = false;
     public Boolean pacManFrenzyPopped = false;
@@ -86,7 +86,7 @@ public class Board extends JPanel implements ActionListener {
                     }
                     popPacman = false;
                 }
-                int anotherRandom = rand.nextInt(30);
+                int anotherRandom = rand.nextInt(27);
                 if(anotherRandom == 9 && score > 0){
                     asteroids.add(new Bonus(rand.nextInt(1300)));
                     score++;
@@ -121,13 +121,32 @@ public class Board extends JPanel implements ActionListener {
 
         for(Asteroid asteroid: asteroids){
             g2d.drawImage(asteroid.getImage(), asteroid.getX(), asteroid.getY(), asteroid.getWidth(), asteroid.getHeight(), this);
+            if(asteroid.isRicardo() || asteroid.isBoss()){
+                g.setColor(Color.black);
+                g.fillRect(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() - 20, 30, 5);
+                g.setColor(Color.red);
+                double cal = (double) 30 / asteroid.maxLife() * asteroid.getLife();
+                int lifeBar = (int) Math.round(cal);
+                g.fillRect(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() - 20, lifeBar, 5);
+            }
         }
         for(Explosion explosion: explosions){
             g2d.drawImage(explosion.getImage(), explosion.getX(), explosion.getY(), 100, 100, this);
         }
 
         g2d.setColor(Color.red);
-        g2d.drawString("Score :" + score, 50, 50);
+        g2d.drawString("Score :" + score, 50, 25);
+
+        g2d.setColor(Color.green);
+        g2d.drawString("Life :" + spaceShip.life, 50, 50);
+
+        g2d.setColor(Color.blue);
+        int power = spaceShip.stack;
+        if(spaceShip.superAttack){
+            power++;
+        }
+        g2d.drawString("Risitas :" + power, 50, 75);
+
     }
 
     @Override
@@ -187,10 +206,10 @@ public class Board extends JPanel implements ActionListener {
                             missiles.remove(i);
                             explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
                             setTimeout(() -> explosions.remove(0), 505);
-                            if(AsteroidDelay - score > 90){
+                            if(AsteroidDelay - score > 150){
                                 asteroidTimer.setDelay(AsteroidDelay - score);
-                                asteroidTimer.restart();
                             }
+                            asteroidTimer.restart();
                         }
                     }
                 }
@@ -220,10 +239,10 @@ public class Board extends JPanel implements ActionListener {
                             missiles.remove(i);
                             explosions.add(new Explosion(asteroid.getX() + (asteroid.getWidth() / 3), asteroid.getY() + (asteroid.getHeight() / 3) ));
                             setTimeout(() -> explosions.remove(0), 505);
-                            if(AsteroidDelay - score > 90){
+                            if(AsteroidDelay - score > 150){
                                 asteroidTimer.setDelay(AsteroidDelay - score);
-                                asteroidTimer.restart();
                             }
+                            asteroidTimer.restart();
                         }
                     }
                 }
@@ -472,7 +491,13 @@ public class Board extends JPanel implements ActionListener {
         pacManFrenzyPopped = false;
         pacManFrenzy = false;
         spaceShip.setDefaultStats();
+        spaceShip.setLife(3);
+        ricardoPopped   = false;
+        instinctSurvival = true;
+        asteroidTimer.setDelay(AsteroidDelay);
+        popBoss = false;
+        popPacman = false;
         setTimeout(() -> {timer.restart(); asteroidTimer.restart();}, 500);
     }
 
-}
+}   

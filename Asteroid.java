@@ -6,11 +6,13 @@ public class Asteroid extends Sprite{
     protected final int BOARD_HEIGHT = 1050;
     public int life;
     private List<RicardoMissile> missile;
+    public int maxlife;
 
 
     public Asteroid(int x, int y, int life){
-        super(x, 0);
+        super(x, y);
         this.life = life;
+        this.maxlife = life;
         this.width = 100;
         this.height = 100;
         initAsteroid();
@@ -27,6 +29,9 @@ public class Asteroid extends Sprite{
         }
     }
 
+    public int maxLife(){
+        return maxlife;
+    }
     public int getLife(){
         return life;
     }

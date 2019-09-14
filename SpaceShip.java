@@ -3,7 +3,10 @@ import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.sound.sampled.Clip;
 import javax.swing.ImageIcon;
+
 
 
 public class SpaceShip extends Sprite {
@@ -32,9 +35,7 @@ public class SpaceShip extends Sprite {
     }
 
     public void move(){
-        if(x > 0 && dx < 0 || x < 1300 && dx > 0){
             x += dx;
-        }
             y += dy;
     }
 
@@ -92,26 +93,34 @@ public class SpaceShip extends Sprite {
    }
 
    public void Kamehamada(){
-        missiles.add(new Missile(x +15, y - 100 / 2, "img/lasershot.png"));
+        missiles.add(new Missile(x +15, y - 100 / 2, "img/kiblast.png"));
    }
 
     public void keyReleased(KeyEvent e){
         int key = e.getKeyCode();
 
         if(key == KeyEvent.VK_LEFT){
-            dx = 0;
+            if(dx < 0){
+                dx = 0;
+            }
         }
 
         if(key == KeyEvent.VK_RIGHT){
-            dx = 0;
+            if(dx > 0){
+                dx = 0;
+            }
         }
 
         if(key == KeyEvent.VK_UP){
-            dy = 0;
+            if(dy < 0){
+                dy = 0;
+            }
         }
 
         if(key == KeyEvent.VK_DOWN){
-            dy = 0;
+            if(dy > 0){
+                dy = 0;
+            }
         }
     }
 
@@ -151,6 +160,12 @@ public class SpaceShip extends Sprite {
 
     public void setDefaultStats(){
         this.superAttack = false;
+        this.instinctSurvival = false;
+        this.superAttack = false;
         this.stack = 0;
+    }
+
+    public void setLife(int life){
+        this.life = life;
     }
 }

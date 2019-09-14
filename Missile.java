@@ -7,9 +7,8 @@ public class Missile extends Sprite{
 
     public Missile(int x, int y, String pathname){
         super(x, y);
-        if(pathname == "img/lasershot.png"){
+        if(pathname == "img/kiblast.png"){
             isSuperAttack = true;
-            System.out.println("hi");
         }
         initMissile(pathname);
         this.BOARD_HEIGHT = 0 - this.width;
@@ -21,7 +20,7 @@ public class Missile extends Sprite{
     }
 
     public boolean isSuperAttack(){
-        return this.isSuperAttack;
+        return isSuperAttack;
     }
 
     public void move(){
